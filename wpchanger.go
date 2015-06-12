@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"syscall"
 	"unsafe"
 
@@ -40,7 +42,7 @@ func main() {
 
 	// save stdin raw data to a file
 	if input == "" && !termutil.Isatty(os.Stdin.Fd()) {
-		input = "wallpaper.jpg"
+		input = fmt.Sprintf("%s/%s", homeDirPath(), "_wallpaper_by_wpchanger_.jpg")
 
 		img, _, err := image.Decode(os.Stdin)
 		if err != nil {
@@ -84,4 +86,16 @@ func SetWallpaper(filename string) uintptr {
 		SPIF_SENDWININICHANGE|SPIF_UPDATEINIFILE)
 
 	return ret
+}
+
+func homeDirPath() string {
+	var path string
+
+	if runtime.GOOS == "windows" {
+		path = os.Getenv("APPDATA")
+	} else {
+		path = os.Getenv("HOME")
+	}
+
+	return path
 }
