@@ -67,8 +67,6 @@ func main() {
 		f.Close()
 	}
 
-	log.Println("input: ", input)
-
 	ret := SetWallpaper(input)
 
 	if ret == 0 {
