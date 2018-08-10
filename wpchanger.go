@@ -125,7 +125,7 @@ func (cmd getCmd) Run(global globalCmd) error {
 }
 
 func main() {
-	app := gli.New(&globalCmd{})
+	app := gli.NewWith(&globalCmd{})
 	app.Version = "0.2.0"
 	app.Copyright = "(C) 2018 Shuhei Kubota"
 	app.Usage = `wpchanger -f wallpaper.jpg
