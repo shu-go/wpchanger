@@ -14,9 +14,9 @@ import (
 	"image/jpeg"
 	_ "image/png"
 
-	"bitbucket.org/shu_go/gli"
-	"bitbucket.org/shu_go/rog"
 	"github.com/andrew-d/go-termutil"
+	"github.com/shu-go/gli"
+	"github.com/shu-go/rog"
 )
 
 var (
