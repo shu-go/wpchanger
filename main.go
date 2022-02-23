@@ -32,15 +32,24 @@ const (
 )
 
 type globalCmd struct {
-	File  string `cli:"f, file=FILE_NAME" help:"the name of an image file. (defaults to stdin/stdout)"`
-	Get   getCmd
+	Set setCmd `cli:"set" help:"set wallpaper"`
+	Get getCmd `cli:"get" help:"get wallpaper"`
 }
+
+type setCmd struct{}
 
 type getCmd struct{}
 
-func (cmd globalCmd) Run() error {
-
-	input := cmd.File
+func (cmd setCmd) Run(args []string) error {
+	var input string
+	if len(args) > 0 {
+		input = args[0]
+	}
+	var err error
+	input, err = filepath.Abs(input)
+	if err != nil {
+		return err
+	}
 
 	// save stdin raw data to a file
 	if input == "" {
@@ -74,14 +83,24 @@ func (cmd globalCmd) Run() error {
 		}
 	}
 
-	err := SetWallpaper(input)
+	err = SetWallpaper(input)
 	if err != nil {
 		return fmt.Errorf("set wallpaper: %v", err)
 	}
 	return nil
 }
 
-func (cmd getCmd) Run(global globalCmd) error {
+func (cmd getCmd) Run(args []string) error {
+	var output string
+	if len(args) > 0 {
+		output = args[0]
+	}
+	var err error
+	output, err = filepath.Abs(output)
+	if err != nil {
+		return err
+	}
+
 	wallname, err := GetWallpaper()
 	if err != nil {
 		return fmt.Errorf("get wallpaper: %v", err)
@@ -93,7 +112,7 @@ func (cmd getCmd) Run(global globalCmd) error {
 	}
 	defer wallfile.Close()
 
-	if global.File == "" {
+	if output == "" {
 		if !termutil.Isatty(os.Stdout.Fd()) {
 			_, err := io.Copy(os.Stdout, wallfile)
 			if err != nil {
@@ -103,19 +122,23 @@ func (cmd getCmd) Run(global globalCmd) error {
 			return fmt.Errorf("no file specified")
 		}
 	} else {
-		output, err := os.Create(global.File)
+		f, err := os.Create(output)
 		if err != nil {
 			return fmt.Errorf("create: %v", err)
 		}
-		defer output.Close()
+		defer f.Close()
 
-		_, err = io.Copy(output, wallfile)
+		_, err = io.Copy(f, wallfile)
 		if err != nil {
 			return fmt.Errorf("copy: %v", err)
 		}
 	}
 
 	return nil
+}
+
+func (cmd globalCmd) Run(args []string, app *gli.App) error {
+	return app.Run(append([]string{"set"}, args...))
 }
 
 func main() {
