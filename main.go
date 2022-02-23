@@ -164,25 +164,31 @@ wpchanger -f wallpaper.jpg get`
 }
 
 func SetWallpaper(filename string) error {
-	_, _, err := procSystemParametersInfo.Call(
+	r1, _, err := procSystemParametersInfo.Call(
 		SPI_SETDESKWALLPAPER,
 		0,
 		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(filename))),
 		SPIF_SENDWININICHANGE|SPIF_UPDATEINIFILE)
 
+	if r1 == 1 {
+		return nil
+	}
 	return err
 }
 
 func GetWallpaper() (string, error) {
 	buf := make([]uint16, 260)
 
-	_, _, _ /*err*/ = procSystemParametersInfo.Call(
+	r1, _, err := procSystemParametersInfo.Call(
 		SPI_GETDESKWALLPAPER,
 		260,
 		uintptr(unsafe.Pointer(&buf[0])),
 		0)
 
-	return syscall.UTF16ToString(buf), nil
+	if r1 == 1 {
+		return syscall.UTF16ToString(buf), nil
+	}
+	return "", err
 }
 
 func homeDirPath() string {
