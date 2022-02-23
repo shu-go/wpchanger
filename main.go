@@ -16,7 +16,6 @@ import (
 
 	"github.com/andrew-d/go-termutil"
 	"github.com/shu-go/gli"
-	"github.com/shu-go/rog"
 )
 
 var (
@@ -35,15 +34,11 @@ const (
 type globalCmd struct {
 	File  string `cli:"f, file=FILE_NAME" help:"the name of an image file. (defaults to stdin/stdout)"`
 	Get   getCmd
-	Debug bool
 }
 
 type getCmd struct{}
 
 func (cmd globalCmd) Run() error {
-	if cmd.Debug {
-		rog.EnableDebug()
-	}
 
 	input := cmd.File
 
@@ -79,7 +74,6 @@ func (cmd globalCmd) Run() error {
 		}
 	}
 
-	rog.Debug("input", input)
 	err := SetWallpaper(input)
 	if err != nil {
 		return fmt.Errorf("set wallpaper: %v", err)
