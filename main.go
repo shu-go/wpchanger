@@ -44,11 +44,19 @@ func (cmd setCmd) Run(args []string) error {
 	var input string
 	if len(args) > 0 {
 		input = args[0]
-	}
-	var err error
-	input, err = filepath.Abs(input)
-	if err != nil {
-		return err
+
+		var err error
+		input, err = filepath.Abs(input)
+		if err != nil {
+			return err
+		}
+
+		s, err := os.Stat(input)
+		if err != nil {
+			return err
+		} else if s.IsDir() {
+			return fmt.Errorf("%s is a directory", input)
+		}
 	}
 
 	// save stdin raw data to a file
@@ -79,14 +87,15 @@ func (cmd setCmd) Run(args []string) error {
 
 			f.Close()
 		} else {
-			return fmt.Errorf("no file specified")
+			return fmt.Errorf("no input")
 		}
 	}
 
-	err = SetWallpaper(input)
+	err := SetWallpaper(input)
 	if err != nil {
 		return fmt.Errorf("set wallpaper: %v", err)
 	}
+
 	return nil
 }
 
@@ -94,11 +103,12 @@ func (cmd getCmd) Run(args []string) error {
 	var output string
 	if len(args) > 0 {
 		output = args[0]
-	}
-	var err error
-	output, err = filepath.Abs(output)
-	if err != nil {
-		return err
+
+		var err error
+		output, err = filepath.Abs(output)
+		if err != nil {
+			return err
+		}
 	}
 
 	wallname, err := GetWallpaper()
@@ -119,7 +129,7 @@ func (cmd getCmd) Run(args []string) error {
 				return fmt.Errorf("copy: %v", err)
 			}
 		} else {
-			return fmt.Errorf("no file specified")
+			return fmt.Errorf("no output")
 		}
 	} else {
 		f, err := os.Create(output)
