@@ -156,30 +156,6 @@ func (cmd globalCmd) Run(args []string, app *gli.App) error {
 	return app.Run(append([]string{"set"}, args...))
 }
 
-// Version is app version
-var Version string
-
-func main() {
-	app := gli.NewWith(&globalCmd{})
-	app.Name = "wpchanger"
-	app.Desc = "A commandline Wallpaper changer for windows"
-	app.Version = Version
-	app.Usage = `# change
-wpchanger wallpaper.png
-cat(or type) wallpaper.png | wpchanger
-
-# get
-wpchanger get original.png
-`
-	app.Copyright = "(C) 2018 Shuhei Kubota"
-	app.SuppressErrorOutput = true
-	err := app.Run(os.Args)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
-	}
-}
-
 func SetWallpaper(filename string) error {
 	r1, _, err := procSystemParametersInfo.Call(
 		SPI_SETDESKWALLPAPER,
@@ -218,4 +194,28 @@ func homeDirPath() string {
 	}
 
 	return path
+}
+
+// Version is app version
+var Version string
+
+func main() {
+	app := gli.NewWith(&globalCmd{})
+	app.Name = "wpchanger"
+	app.Desc = "A commandline Wallpaper changer for windows"
+	app.Version = Version
+	app.Usage = `# change
+wpchanger wallpaper.png
+cat(or type) wallpaper.png | wpchanger
+
+# get
+wpchanger get original.png
+`
+	app.Copyright = "(C) 2018 Shuhei Kubota"
+	app.SuppressErrorOutput = true
+	err := app.Run(os.Args)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
 }
